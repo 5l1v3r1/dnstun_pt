@@ -17,6 +17,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"fmt"
 )
 
 import "git.torproject.org/pluggable-transports/goptlib.git"

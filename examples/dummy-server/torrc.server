@@ -1,0 +1,5 @@
+BridgeRelay 1
+ORPort 9001
+ExtORPort 6669
+ServerTransportPlugin dummy exec dummy-server
+# Log debug file /Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-server/logs/tor_debug.log
