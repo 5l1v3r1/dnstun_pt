@@ -18,6 +18,7 @@ import (
 	"sync"
 	"syscall"
 	"fmt"
+	"time"
 )
 
 import "git.torproject.org/pluggable-transports/goptlib.git"
@@ -28,7 +29,10 @@ var ptInfo pt.ClientInfo
 // ends, -1 is written.
 var handlerChan = make(chan int)
 
+var msgChan = make(chan string)
+
 func copyLoop(a, b net.Conn) {
+	fmt.Println("copy loop")
 	var wg sync.WaitGroup
 	wg.Add(2)
 
@@ -52,6 +56,11 @@ func handler(conn *pt.SocksConn) error {
 
 	defer conn.Close()
 	remote, err := net.Dial("tcp", conn.Req.Target)
+
+	logfile, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/asdf.log")
+	defer logfile.Close()
+	logfile.WriteString(conn.Req.Target)
+
 	if err != nil {
 		conn.Reject()
 		return err
@@ -82,6 +91,7 @@ func acceptLoop(ln *pt.SocksListener) error {
 }
 
 func main() {
+	fmt.Println("swag")
 	var err error
 
 	ptInfo, err = pt.ClientSetup([]string{"dummy"})
@@ -138,4 +148,7 @@ func main() {
 		case sig = <-sigChan:
 		}
 	}
+
+	time.Sleep(1000000)
+	fmt.Println("doneeee")
 }
