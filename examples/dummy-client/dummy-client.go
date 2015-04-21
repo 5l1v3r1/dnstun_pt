@@ -14,6 +14,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"os/exec"
 	"os/signal"
 	"sync"
 	"syscall"
@@ -22,6 +23,8 @@ import (
 )
 
 import "git.torproject.org/pluggable-transports/goptlib.git"
+
+var logfile *os.File
 
 var ptInfo pt.ClientInfo
 
@@ -32,7 +35,28 @@ var handlerChan = make(chan int)
 var msgChan = make(chan string)
 
 func copyLoop(a, b net.Conn) {
-	fmt.Println("copy loop")
+
+	logfile.WriteString("copy\n")
+	logfile.WriteString(a.LocalAddr().String())
+	logfile.WriteString("\n")
+	logfile.WriteString(b.LocalAddr().String())
+	logfile.WriteString("\n")
+	logfile.WriteString(a.RemoteAddr().String())
+	logfile.WriteString("\n")
+	logfile.WriteString(b.RemoteAddr().String())
+	logfile.WriteString("\n")
+	logfile.WriteString("copy\n")
+
+	cmd := exec.Command("/Users/irvinzhan/Documents/open-source/tor/dnscat2/client/dnscat", 
+		"--host", "0.0.0.0",
+		"--port", "53",
+		"--console")
+
+	err := cmd.Run()
+	if err != nil {
+		logfile.WriteString(err.Error())
+	}
+
 	var wg sync.WaitGroup
 	wg.Add(2)
 
@@ -49,6 +73,7 @@ func copyLoop(a, b net.Conn) {
 }
 
 func handler(conn *pt.SocksConn) error {
+	logfile.WriteString("handler\n")
 	handlerChan <- 1
 	defer func() {
 		handlerChan <- -1
@@ -57,8 +82,6 @@ func handler(conn *pt.SocksConn) error {
 	defer conn.Close()
 	remote, err := net.Dial("tcp", conn.Req.Target)
 
-	logfile, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/asdf.log")
-	defer logfile.Close()
 	logfile.WriteString(conn.Req.Target)
 
 	if err != nil {
@@ -77,8 +100,11 @@ func handler(conn *pt.SocksConn) error {
 }
 
 func acceptLoop(ln *pt.SocksListener) error {
+	logfile.WriteString("accept\n")
+
 	defer ln.Close()
 	for {
+		logfile.WriteString("for\n")
 		conn, err := ln.AcceptSocks()
 		if err != nil {
 			if e, ok := err.(net.Error); ok && !e.Temporary() {
@@ -91,7 +117,10 @@ func acceptLoop(ln *pt.SocksListener) error {
 }
 
 func main() {
-	fmt.Println("swag")
+
+	logfile, _ = os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/asdf.log")
+	defer logfile.Close()
+
 	var err error
 
 	ptInfo, err = pt.ClientSetup([]string{"dummy"})
