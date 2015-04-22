@@ -35,6 +35,8 @@ var handlerChan = make(chan int)
 var msgChan = make(chan string)
 
 func copyLoop(a, b net.Conn) {
+	// a = 127.0.0.1:54861 (random port...)
+	// b = 127.0.0.1:9001 (server)
 
 	logfile.WriteString("copy\n")
 	logfile.WriteString(a.LocalAddr().String())
@@ -51,7 +53,8 @@ func copyLoop(a, b net.Conn) {
 		"--host", "0.0.0.0",
 		"--port", "53",
 		"--console")
-
+	cmd.Stdin = a
+	cmd.Stdout = a
 	err := cmd.Run()
 	if err != nil {
 		logfile.WriteString(err.Error())
