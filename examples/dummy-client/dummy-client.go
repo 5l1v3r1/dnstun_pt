@@ -18,8 +18,6 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
-	"fmt"
-	"time"
 )
 
 import "git.torproject.org/pluggable-transports/goptlib.git"
@@ -53,8 +51,8 @@ func copyLoop(a, b net.Conn) {
 		"--host", "0.0.0.0",
 		"--port", "53",
 		"--console")
-	cmd.Stdin = a
-	cmd.Stdout = a
+	// cmd.Stdin = a
+	// cmd.Stdout = a
 	err := cmd.Run()
 	if err != nil {
 		logfile.WriteString(err.Error())
@@ -107,8 +105,9 @@ func acceptLoop(ln *pt.SocksListener) error {
 
 	defer ln.Close()
 	for {
-		logfile.WriteString("for\n")
+		logfile.WriteString("before accept\n")
 		conn, err := ln.AcceptSocks()
+		logfile.WriteString("after accept\n")
 		if err != nil {
 			if e, ok := err.(net.Error); ok && !e.Temporary() {
 				return err
@@ -121,7 +120,7 @@ func acceptLoop(ln *pt.SocksListener) error {
 
 func main() {
 
-	logfile, _ = os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/asdf.log")
+	logfile, _ = os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/client.log")
 	defer logfile.Close()
 
 	var err error
@@ -180,7 +179,4 @@ func main() {
 		case sig = <-sigChan:
 		}
 	}
-
-	time.Sleep(1000000)
-	fmt.Println("doneeee")
 }

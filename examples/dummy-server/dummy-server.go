@@ -22,6 +22,8 @@ import (
 
 import "git.torproject.org/pluggable-transports/goptlib.git"
 
+var logfile *os.File
+
 var ptInfo pt.ServerInfo
 
 // When a connection handler starts, +1 is written to this channel; when it
@@ -29,6 +31,18 @@ var ptInfo pt.ServerInfo
 var handlerChan = make(chan int)
 
 func copyLoop(a, b net.Conn) {
+
+	logfile.WriteString("server\n")
+	logfile.WriteString(a.LocalAddr().String())
+	logfile.WriteString("\n")
+	logfile.WriteString(b.LocalAddr().String())
+	logfile.WriteString("\n")
+	logfile.WriteString(a.RemoteAddr().String())
+	logfile.WriteString("\n")
+	logfile.WriteString(b.RemoteAddr().String())
+	logfile.WriteString("\n")
+	logfile.WriteString("server\n")
+
 	var wg sync.WaitGroup
 	wg.Add(2)
 
@@ -47,6 +61,8 @@ func copyLoop(a, b net.Conn) {
 func handler(conn net.Conn) error {
 	defer conn.Close()
 
+	logfile.WriteString("handler\n")
+
 	handlerChan <- 1
 	defer func() {
 		handlerChan <- -1
@@ -64,9 +80,12 @@ func handler(conn net.Conn) error {
 }
 
 func acceptLoop(ln net.Listener) error {
+	logfile.WriteString("accept loop\n")
 	defer ln.Close()
 	for {
+		logfile.WriteString("before accept\n")
 		conn, err := ln.Accept()
+		logfile.WriteString("after accept\n")
 		if err != nil {
 			if e, ok := err.(net.Error); ok && !e.Temporary() {
 				return err
@@ -78,6 +97,12 @@ func acceptLoop(ln net.Listener) error {
 }
 
 func main() {
+
+	logfile, _ = os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/server.log")
+	defer logfile.Close()
+
+	logfile.WriteString("main\n")
+
 	var err error
 
 	ptInfo, err = pt.ServerSetup([]string{"dummy"})
@@ -89,6 +114,7 @@ func main() {
 	for _, bindaddr := range ptInfo.Bindaddrs {
 		switch bindaddr.MethodName {
 		case "dummy":
+			logfile.WriteString(bindaddr.Addr.String())
 			ln, err := net.ListenTCP("tcp", bindaddr.Addr)
 			if err != nil {
 				pt.SmethodError(bindaddr.MethodName, err.Error())
