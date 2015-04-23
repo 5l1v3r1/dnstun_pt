@@ -6,7 +6,88 @@ before accept
 handler
 server
 127.0.0.1:5353
-127.0.0.1:52198
-127.0.0.1:52197
+127.0.0.1:56467
+127.0.0.1:56466
 127.0.0.1:6669
 server
+done
+after accept
+before accept
+handler
+server
+127.0.0.1:5353
+127.0.0.1:56485
+127.0.0.1:56484
+127.0.0.1:6669
+server
+done
+after accept
+before accept
+handler
+server
+127.0.0.1:5353
+127.0.0.1:56493
+127.0.0.1:56492
+127.0.0.1:6669
+server
+done
+after accept
+before accept
+handler
+server
+127.0.0.1:5353
+127.0.0.1:56511
+127.0.0.1:56510
+127.0.0.1:6669
+server
+done
+after accept
+before accept
+handler
+server
+127.0.0.1:5353
+127.0.0.1:56520
+127.0.0.1:56519
+127.0.0.1:6669
+server
+done
+after accept
+before accept
+handler
+server
+127.0.0.1:5353
+127.0.0.1:56528
+127.0.0.1:56527
+127.0.0.1:6669
+server
+done
+after accept
+before accept
+handler
+server
+127.0.0.1:5353
+127.0.0.1:56883
+127.0.0.1:56882
+127.0.0.1:6669
+server
+done
+after accept
+before accept
+handler
+server
+127.0.0.1:5353
+127.0.0.1:57032
+127.0.0.1:57031
+127.0.0.1:6669
+server
+done
+after accept
+before accept
+handler
+server
+127.0.0.1:5353
+127.0.0.1:57040
+127.0.0.1:57039
+127.0.0.1:6669
+server
+done

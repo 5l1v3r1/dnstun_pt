@@ -34,7 +34,7 @@ var msgChan = make(chan string)
 
 func copyLoop(a, b net.Conn) {
 	// a = 127.0.0.1:54861 (random port...)
-	// b = 127.0.0.1:9001 (server)
+	// b = 127.0.0.1:5353 (server)
 
 	logfile.WriteString("copy\n")
 	logfile.WriteString(a.LocalAddr().String())
@@ -47,22 +47,42 @@ func copyLoop(a, b net.Conn) {
 	logfile.WriteString("\n")
 	logfile.WriteString("copy\n")
 
-	cmd := exec.Command("/Users/irvinzhan/Documents/open-source/tor/dnscat2/client/dnscat", 
-		"--host", "0.0.0.0",
-		"--port", "53",
-		"--console")
-	// cmd.Stdin = a
-	// cmd.Stdout = a
-	err := cmd.Run()
-	if err != nil {
-		logfile.WriteString(err.Error())
-	}
+
+
+	// var wg2 sync.WaitGroup
+	// wg2.Add(2)
+	// var buffer1 bytes.Buffer
+	// var buffer2 bytes.Buffer
+	// go func() {
+	// 	io.Copy(&buffer1, &buffer2)
+	// 	wg2.Done()
+	// }()
+	// go func() {
+	// 	io.Copy(&buffer2, &buffer1)
+	// 	wg2.Done()
+	// }()
 
 	var wg sync.WaitGroup
 	wg.Add(2)
 
+
+	logfile.WriteString("running command\n")
+	cmd := exec.Command("/Users/irvinzhan/Documents/open-source/tor/dnscat2/client/dnscat", 
+		"--host", "0.0.0.0",
+		"--port", "53",
+		"--console")
+	teeReader := io.TeeReader(a, b)
+	cmd.Stdin = teeReader
+	// cmd.Stdout = a
+	err := cmd.Start()
+	if err != nil {
+		logfile.WriteString(err.Error())
+	}
+	logfile.WriteString("continuing command\n")
+
+
 	go func() {
-		io.Copy(b, a)
+		// io.Copy(b, teeReader)
 		wg.Done()
 	}()
 	go func() {
@@ -71,6 +91,8 @@ func copyLoop(a, b net.Conn) {
 	}()
 
 	wg.Wait()
+	// wg2.Wait()
+	cmd.Wait()
 }
 
 func handler(conn *pt.SocksConn) error {
