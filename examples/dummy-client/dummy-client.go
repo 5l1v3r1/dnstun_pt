@@ -71,7 +71,7 @@ func copyLoop(a, b net.Conn) {
 		"--host", "0.0.0.0",
 		"--port", "53",
 		"--console")
-	teeReader := io.TeeReader(a, b)
+	teeReader := io.TeeReader(a, b) // reversed from io.copy
 	cmd.Stdin = teeReader
 	// cmd.Stdout = a
 	err := cmd.Start()
@@ -82,7 +82,7 @@ func copyLoop(a, b net.Conn) {
 
 
 	go func() {
-		// io.Copy(b, teeReader)
+		// io.Copy(b, a)
 		wg.Done()
 	}()
 	go func() {

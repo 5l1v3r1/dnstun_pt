@@ -15,6 +15,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"os/exec"
 	"os/signal"
 	"sync"
 	"syscall"
@@ -43,6 +44,9 @@ func copyLoop(a, b net.Conn) {
 	logfile.WriteString("\n")
 	logfile.WriteString("server\n")
 
+
+
+	logfile.WriteString("done\n")
 	var wg sync.WaitGroup
 	wg.Add(2)
 
@@ -97,11 +101,29 @@ func acceptLoop(ln net.Listener) error {
 }
 
 func main() {
-
 	logfile, _ = os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/server.log")
 	defer logfile.Close()
 
+	dummyfile, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/server.log")
+	defer dummyfile.Close()
+
 	logfile.WriteString("main\n")
+
+	// CMD STUFF
+	cmd := exec.Command("/Users/irvinzhan/.rvm/bin/rvmsudo", 
+		"ruby", "/Users/irvinzhan/Documents/open-source/tor/dnscat2/server/dnscat2.rb")
+	// teeReader := io.TeeReader(a, b)
+	cmd.Stdin = dummyfile
+	out, err3 := cmd.StdoutPipe()
+	if err3 != nil {
+		logfile.WriteString(err3.Error())
+	}
+	go io.Copy(logfile, out)
+	// cmd.Stdout = logfile
+	err2 := cmd.Start()
+	if err2 != nil {
+		logfile.WriteString(err2.Error())
+	}
 
 	var err error
 
@@ -160,4 +182,7 @@ func main() {
 		case sig = <-sigChan:
 		}
 	}
+
+
+	cmd.Wait()
 }
