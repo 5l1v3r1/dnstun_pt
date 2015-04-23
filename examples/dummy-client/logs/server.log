@@ -1,3 +1,12 @@
 main
-[::]:61522accept loop
+127.0.0.1:5353accept loop
 before accept
+after accept
+before accept
+handler
+server
+127.0.0.1:5353
+127.0.0.1:52198
+127.0.0.1:52197
+127.0.0.1:6669
+server
