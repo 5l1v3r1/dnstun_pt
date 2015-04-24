@@ -47,21 +47,6 @@ func copyLoop(a, b net.Conn) {
 	logfile.WriteString("\n")
 	logfile.WriteString("copy\n")
 
-
-
-	// var wg2 sync.WaitGroup
-	// wg2.Add(2)
-	// var buffer1 bytes.Buffer
-	// var buffer2 bytes.Buffer
-	// go func() {
-	// 	io.Copy(&buffer1, &buffer2)
-	// 	wg2.Done()
-	// }()
-	// go func() {
-	// 	io.Copy(&buffer2, &buffer1)
-	// 	wg2.Done()
-	// }()
-
 	var wg sync.WaitGroup
 	wg.Add(2)
 
@@ -79,7 +64,6 @@ func copyLoop(a, b net.Conn) {
 		logfile.WriteString(err.Error())
 	}
 	logfile.WriteString("continuing command\n")
-
 
 	go func() {
 		// io.Copy(b, a)
