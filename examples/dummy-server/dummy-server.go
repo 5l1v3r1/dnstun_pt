@@ -47,12 +47,17 @@ func copyLoop(a, b net.Conn) {
   dummyfile, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/dummyfile")
   defer dummyfile.Close()
   // dummyfile2, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/dummyfile2")
-  // defer dummyfile.Close()
+  // defer dummyfile2.Close()
 
   // CMD STUFF
   cmd := exec.Command("/Users/irvinzhan/.rvm/bin/rvmsudo", 
     "ruby", "/Users/irvinzhan/Documents/open-source/tor/dnscat2/server/dnscat2.rb")
-  // cmd.Stdin = dummyfile
+  teereader := io.TeeReader(b, a)
+  // in, err4 := cmd.StdinPipe()
+  // if err4 != nil {
+  //   logfile.WriteString(err4.Error())
+  // }
+  cmd.Stdin = teereader 
   out, err3 := cmd.StderrPipe()
   if err3 != nil {
     logfile.WriteString(err3.Error())
@@ -61,7 +66,6 @@ func copyLoop(a, b net.Conn) {
   if err2 != nil {
     logfile.WriteString(err2.Error())
   }
-  // teeReader := io.TeeReader(a, b)
 
 
   logfile.WriteString("done\n")
@@ -81,7 +85,7 @@ func copyLoop(a, b net.Conn) {
     wg.Done()
   }()
   go func() {
-    io.Copy(a, b)
+    // io.Copy(a, b)
     wg.Done()
   }()
 

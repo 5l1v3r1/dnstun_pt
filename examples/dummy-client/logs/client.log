@@ -4,20 +4,9 @@ after accept
 before accept
 handler
 127.0.0.1:5353copy
-127.0.0.1:50931
-127.0.0.1:50934
-127.0.0.1:50933
-127.0.0.1:5353
-copy
-running command
-continuing command
-after accept
-before accept
-handler
-127.0.0.1:5353copy
-127.0.0.1:50931
-127.0.0.1:50954
-127.0.0.1:50953
+127.0.0.1:52530
+127.0.0.1:52532
+127.0.0.1:52531
 127.0.0.1:5353
 copy
 running command

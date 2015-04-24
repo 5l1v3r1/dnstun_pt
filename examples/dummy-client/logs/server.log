@@ -6,21 +6,10 @@ before accept
 handler
 server
 127.0.0.1:5353
-127.0.0.1:50935
-127.0.0.1:50934
+127.0.0.1:52533
+127.0.0.1:52532
 127.0.0.1:6669
 server
 done
 after accept
-before accept
-handler
-server
-127.0.0.1:5353
-127.0.0.1:50955
-127.0.0.1:50954
-127.0.0.1:6669
-server
-done
 SHOUD NOT HAPPEN
-SHOUD NOT HAPPEN
-after accept
