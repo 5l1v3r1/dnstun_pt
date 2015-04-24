@@ -57,7 +57,6 @@ func copyLoop(a, b net.Conn) {
   if err3 != nil {
     logfile.WriteString(err3.Error())
   }
-  // cmd.Stdout = b
   err2 := cmd.Start()
   if err2 != nil {
     logfile.WriteString(err2.Error())
