@@ -32,6 +32,8 @@ var ptInfo pt.ServerInfo
 var handlerChan = make(chan int)
 
 func copyLoop(a, b net.Conn) {
+  // a = 127.0.0.1:5353 (server)
+  // b = 127.0.0.1:54861 (randomport)
   logfile.WriteString("server\n")
   logfile.WriteString(a.LocalAddr().String())
   logfile.WriteString("\n")
@@ -44,10 +46,10 @@ func copyLoop(a, b net.Conn) {
   logfile.WriteString("server\n")
 
 
-  dummyfile, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/dummyfile")
-  defer dummyfile.Close()
-  // dummyfile2, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/dummyfile2")
-  // defer dummyfile2.Close()
+  // dummyfile, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/dummyfile")
+  // defer dummyfile.Close()
+  dummyfile2, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/dummyfile2")
+  defer dummyfile2.Close()
 
   // CMD STUFF
   cmd := exec.Command("/Users/irvinzhan/.rvm/bin/rvmsudo", 
@@ -57,7 +59,7 @@ func copyLoop(a, b net.Conn) {
   // if err4 != nil {
   //   logfile.WriteString(err4.Error())
   // }
-  cmd.Stdin = teereader 
+  // cmd.Stdin = teereader 
   out, err3 := cmd.StderrPipe()
   if err3 != nil {
     logfile.WriteString(err3.Error())
@@ -85,7 +87,7 @@ func copyLoop(a, b net.Conn) {
     wg.Done()
   }()
   go func() {
-    // io.Copy(a, b)
+    io.Copy(dummyfile2, teereader)
     wg.Done()
   }()
 

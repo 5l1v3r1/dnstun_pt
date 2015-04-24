@@ -50,6 +50,10 @@ func copyLoop(a, b net.Conn) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
+  dummyfile, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/dummyfile")
+  defer dummyfile.Close()
+  // dummyfile2, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/dummyfile2")
+  // defer dummyfile2.Close()
 
 	logfile.WriteString("running command\n")
 	cmd := exec.Command("/Users/irvinzhan/Documents/open-source/tor/dnscat2/client/dnscat", 
@@ -57,7 +61,10 @@ func copyLoop(a, b net.Conn) {
 		"--port", "53",
 		"--console")
 	cmd.Stdin = a
-	// cmd.Stdout = a
+  out, err3 := cmd.StdoutPipe()
+  if err3 != nil {
+    logfile.WriteString(err3.Error())
+  }
 	err := cmd.Start()
 	if err != nil {
 		logfile.WriteString(err.Error())
@@ -65,11 +72,11 @@ func copyLoop(a, b net.Conn) {
 	logfile.WriteString("continuing command\n")
 
 	go func() {
-		// io.Copy(b, a)
+		io.Copy(dummyfile, out)
 		wg.Done()
 	}()
 	go func() {
-		io.Copy(a, b)
+		io.Copy(a, b) // read from b and write to a
 		wg.Done()
 	}()
 
