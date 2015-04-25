@@ -1,2 +1,4 @@
 /examples/dummy-client/datadir-client
 /examples/dummy-server/datadir-server
+/examples/dummy-client/logs/
+/examples/dummy-server/logs/
