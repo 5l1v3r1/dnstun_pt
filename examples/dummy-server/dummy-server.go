@@ -53,7 +53,7 @@ func copyLoop(a, b net.Conn) {
 
   // CMD STUFF
   cmd := exec.Command("/Users/irvinzhan/.rvm/bin/rvmsudo", 
-    "ruby", "/Users/irvinzhan/Documents/open-source/tor/dnscat2/server/dnscat2.rb")
+    "ruby", "/Users/irvinzhan/Documents/open-source/tor/dnscat2/server/dnscat2.rb", "-u")
   teereader := io.TeeReader(b, a)
   // in, err4 := cmd.StdinPipe()
   // if err4 != nil {
