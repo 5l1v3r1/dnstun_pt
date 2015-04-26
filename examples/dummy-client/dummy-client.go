@@ -11,12 +11,11 @@
 package main
 
 import (
-	"io"
 	"net"
 	"os"
 	"os/exec"
 	"os/signal"
-	"sync"
+	// "sync"
 	"syscall"
 )
 
@@ -47,48 +46,21 @@ func copyLoop(a, b net.Conn) {
 	logfile.WriteString("\n")
 	logfile.WriteString("copy\n")
 
-	var wg sync.WaitGroup
-	wg.Add(3)
-
-  dummyfile, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/dummyfile")
-  defer dummyfile.Close()
-
 	logfile.WriteString("running command\n")
+
 	cmd := exec.Command("/Users/irvinzhan/Documents/open-source/tor/dnscat2/client/dnscat", 
 		"--host", "0.0.0.0",
 		"--port", "53",
 		"--console")
-  in, err4 := cmd.StdinPipe()
-  if err4 != nil {
-    logfile.WriteString(err4.Error())
-  }
-	// cmd.Stdin = a
-  out, err3 := cmd.StdoutPipe()
-  if err3 != nil {
-    logfile.WriteString(err3.Error())
-  }
+	cmd.Stdin = a
+	cmd.Stdout = a
 	err := cmd.Start()
 	if err != nil {
 		logfile.WriteString(err.Error())
 	}
+
 	logfile.WriteString("continuing command\n")
 
-	go func() {
-		io.Copy(a, out)
-	logfile.WriteString("REALLYSHOULDNT HAPPEN\n")
-		wg.Done()
-	}()
-	go func() {
-		io.Copy(in, a) // read from a and write to in
-		wg.Done()
-	}()
-	go func() {
-		io.Copy(dummyfile, b)
-		wg.Done()
-	}()
-
-	wg.Wait()
-	// wg2.Wait()
 	cmd.Wait()
 }
 

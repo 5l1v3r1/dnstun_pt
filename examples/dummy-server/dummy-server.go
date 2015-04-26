@@ -12,12 +12,10 @@
 package main
 
 import (
-  "io"
   "net"
   "os"
   "os/exec"
   "os/signal"
-  "sync"
   "syscall"
 )
 
@@ -45,64 +43,20 @@ func copyLoop(a, b net.Conn) {
   logfile.WriteString("\n")
   logfile.WriteString("server\n")
 
-
-  dummyfile, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/dummyfile555")
-  defer dummyfile.Close()
-  // dummyfile2, _ := os.Create("/Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/dummyfile2")
-  // defer dummyfile2.Close()
-
   // CMD STUFF
   cmd := exec.Command("/Users/irvinzhan/.rvm/bin/rvmsudo", 
     "ruby", "/Users/irvinzhan/Documents/open-source/tor/dnscat2/server/dnscat2.rb", "-u")
-  // teereader := io.TeeReader(b, a)
-  in, err4 := cmd.StdinPipe()
-  if err4 != nil {
-    logfile.WriteString(err4.Error())
-  }
-  // cmd.Stdin = b 
-  out, err3 := cmd.StderrPipe()
-  if err3 != nil {
-    logfile.WriteString(err3.Error())
-  }
 
-  output, err5 := cmd.StdoutPipe()
-  if err5 != nil {
-    logfile.WriteString(err5.Error())
-  }
+  cmd.Stdin = b 
+  cmd.Stderr = b
+
   err2 := cmd.Start()
   if err2 != nil {
     logfile.WriteString(err2.Error())
   }
 
-
   logfile.WriteString("done\n")
-  var wg sync.WaitGroup
-  wg.Add(3)
 
-
-  // go func() {
-  //   io.Copy(dummyfile, out)
-  //   logfile.WriteString("SHOUD NOT HAPPEN\n")
-  //   wg.Done()
-  // }()
-
-  go func() {
-    io.Copy(b, out)
-    logfile.WriteString("SHOULD NOT HAPPEN\n")
-    wg.Done()
-  }()
-  go func() {
-    io.Copy(in, b)
-    logfile.WriteString("ALSO SHOULD NOT HAPPEN\n")
-    wg.Done()
-  }()
-  go func() {
-    io.Copy(dummyfile, output)
-    logfile.WriteString("ALSO SHOULD NOT HAPPEN\n")
-    wg.Done()
-  }()
-
-  wg.Wait()
   cmd.Wait()
 }
 
