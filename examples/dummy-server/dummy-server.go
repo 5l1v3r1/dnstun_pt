@@ -59,7 +59,7 @@ func copyLoop(a, b net.Conn) {
   // if err4 != nil {
   //   logfile.WriteString(err4.Error())
   // }
-  // cmd.Stdin = teereader 
+  cmd.Stdin = teereader 
   out, err3 := cmd.StderrPipe()
   if err3 != nil {
     logfile.WriteString(err3.Error())
