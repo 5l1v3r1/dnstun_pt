@@ -1,5 +1,5 @@
 UseBridges 1
-Bridge dummy 127.0.0.1:5353
+Bridge dummy 52.1.124.178:5353
 ClientTransportPlugin dummy exec dummy-client
 SocksPort 10000
 # Log notice file /Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-client/logs/notice.log
