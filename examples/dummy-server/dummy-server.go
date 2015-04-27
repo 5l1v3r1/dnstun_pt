@@ -12,6 +12,8 @@
 package main
 
 import (
+  "sync"
+  "io"
   "net"
   "os"
   "os/exec"
@@ -22,6 +24,11 @@ import (
 import "git.torproject.org/pluggable-transports/goptlib.git"
 
 var logfile *os.File
+var in io.WriteCloser
+var out io.ReadCloser
+var err1 error
+var err2 error
+var cmd *exec.Cmd
 
 var ptInfo pt.ServerInfo
 
@@ -30,6 +37,10 @@ var ptInfo pt.ServerInfo
 var handlerChan = make(chan int)
 
 func copyLoop(a, b net.Conn) {
+  defer func() {
+    logfile.WriteString("defer called\n")
+  }()
+
   // a = 127.0.0.1:5353 (server)
   // b = 127.0.0.1:54861 (randomport)
   logfile.WriteString("server\n")
@@ -44,19 +55,48 @@ func copyLoop(a, b net.Conn) {
   logfile.WriteString("server\n")
 
   // CMD STUFF
-  cmd := exec.Command("/Users/irvinzhan/.rvm/bin/rvmsudo", 
+  if cmd != nil {
+    logfile.WriteString("killing process\n")
+    err9 := cmd.Process.Kill()
+    if err9 != nil {
+      logfile.WriteString(err9.Error())
+    }
+  }
+  logfile.WriteString("running command\n")
+  cmd = exec.Command("/Users/irvinzhan/.rvm/bin/rvmsudo", 
     "ruby", "/Users/irvinzhan/Documents/open-source/tor/dnscat2/server/dnscat2.rb", "-u")
-
-  cmd.Stdin = b 
-  cmd.Stderr = b
-
-  err2 := cmd.Start()
+  in, err1 = cmd.StdinPipe()
+  if err1 != nil {
+    logfile.WriteString(err1.Error())
+  }
+  out, err2 = cmd.StderrPipe()
   if err2 != nil {
     logfile.WriteString(err2.Error())
   }
+  err3 := cmd.Start()
+  if err3 != nil {
+    logfile.WriteString(err3.Error())
+  }
+  logfile.WriteString("finished start\n")
+
+  // cmd.Stdin = b 
+  // cmd.Stderr = b
+
+  var wg sync.WaitGroup
+  wg.Add(2)
+
+  go func() {
+    io.Copy(in, b)
+    wg.Done()
+  }()
+  go func() {
+    io.Copy(b, out)
+    wg.Done()
+  }()
 
   logfile.WriteString("done\n")
 
+  wg.Wait()
   cmd.Wait()
 }
 
@@ -110,6 +150,7 @@ func main() {
   if err != nil {
     os.Exit(1)
   }
+
 
   listeners := make([]net.Listener, 0)
   for _, bindaddr := range ptInfo.Bindaddrs {
