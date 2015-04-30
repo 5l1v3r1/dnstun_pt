@@ -49,7 +49,7 @@ func copyLoop(a, b net.Conn) {
 	logfile.WriteString("running command\n")
 
 	cmd := exec.Command("/Users/irvinzhan/Documents/open-source/tor/dnscat2/client/dnscat", 
-		"--host", "52.1.124.178",
+		"--host", "52.5.198.6",
 		"--port", "53",
 		"--console")
 	cmd.Stdin = a
