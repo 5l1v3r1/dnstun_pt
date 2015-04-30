@@ -44,8 +44,8 @@ func copyLoop(a, b net.Conn) {
   logfile.WriteString("server\n")
 
   // CMD STUFF
-  cmd := exec.Command("/Users/irvinzhan/.rvm/bin/rvmsudo", 
-    "ruby", "/Users/irvinzhan/Documents/open-source/tor/dnscat2/server/dnscat2.rb", "-u")
+  cmd := exec.Command("rvmsudo", 
+    "ruby", "/home/ec2-user/dnscat2_temp/server/dnscat2.rb", "simpleapp.me", "-u")
 
   cmd.Stdin = b 
   cmd.Stderr = b

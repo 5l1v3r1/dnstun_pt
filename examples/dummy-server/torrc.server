@@ -2,5 +2,5 @@ BridgeRelay 1
 ORPort 9001
 ExtORPort 6669
 ServerTransportPlugin dummy exec dummy-server
-ServerTransportListenAddr dummy 127.0.0.1:5353
+ServerTransportListenAddr dummy 0.0.0.0:5353
 # Log debug file /Users/irvinzhan/Documents/open-source/tor/goptlib/examples/dummy-server/logs/tor_debug.log
