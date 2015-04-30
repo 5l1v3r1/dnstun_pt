@@ -13,9 +13,9 @@ package main
 import (
 	"net"
 	"os"
-	"os/exec"
 	"os/signal"
-	// "sync"
+	"io"
+	"sync"
 	"syscall"
 )
 
@@ -32,36 +32,19 @@ var handlerChan = make(chan int)
 var msgChan = make(chan string)
 
 func copyLoop(a, b net.Conn) {
-	// a = 127.0.0.1:54861 (random port...)
-	// b = 127.0.0.1:5353 (server)
+  var wg sync.WaitGroup
+  wg.Add(2)
 
-	logfile.WriteString("copy\n")
-	logfile.WriteString(a.LocalAddr().String())
-	logfile.WriteString("\n")
-	logfile.WriteString(b.LocalAddr().String())
-	logfile.WriteString("\n")
-	logfile.WriteString(a.RemoteAddr().String())
-	logfile.WriteString("\n")
-	logfile.WriteString(b.RemoteAddr().String())
-	logfile.WriteString("\n")
-	logfile.WriteString("copy\n")
+  go func() {
+    io.Copy(b, a)
+    wg.Done()
+  }()
+  go func() {
+    io.Copy(a, b)
+    wg.Done()
+  }()
 
-	logfile.WriteString("running command\n")
-
-	cmd := exec.Command("/Users/irvinzhan/Documents/open-source/tor/dnscat2/client/dnscat", 
-		"--host", "52.5.198.6",
-		"--port", "53",
-		"--console")
-	cmd.Stdin = a
-	cmd.Stdout = a
-	err := cmd.Start()
-	if err != nil {
-		logfile.WriteString(err.Error())
-	}
-
-	logfile.WriteString("continuing command\n")
-
-	cmd.Wait()
+  wg.Wait()
 }
 
 func handler(conn *pt.SocksConn) error {

@@ -14,7 +14,8 @@ package main
 import (
   "net"
   "os"
-  "os/exec"
+  "io"
+  "sync"
   "os/signal"
   "syscall"
 )
@@ -30,34 +31,19 @@ var ptInfo pt.ServerInfo
 var handlerChan = make(chan int)
 
 func copyLoop(a, b net.Conn) {
-  // a = 127.0.0.1:5353 (server)
-  // b = 127.0.0.1:54861 (randomport)
-  logfile.WriteString("server\n")
-  logfile.WriteString(a.LocalAddr().String())
-  logfile.WriteString("\n")
-  logfile.WriteString(b.LocalAddr().String())
-  logfile.WriteString("\n")
-  logfile.WriteString(a.RemoteAddr().String())
-  logfile.WriteString("\n")
-  logfile.WriteString(b.RemoteAddr().String())
-  logfile.WriteString("\n")
-  logfile.WriteString("server\n")
+  var wg sync.WaitGroup
+  wg.Add(2)
 
-  // CMD STUFF
-  cmd := exec.Command("rvmsudo", 
-    "ruby", "/home/ec2-user/dnscat2_temp/server/dnscat2.rb", "simpleapp.me", "-u")
+  go func() {
+    io.Copy(b, a)
+    wg.Done()
+  }()
+  go func() {
+    io.Copy(a, b)
+    wg.Done()
+  }()
 
-  cmd.Stdin = b 
-  cmd.Stderr = b
-
-  err2 := cmd.Start()
-  if err2 != nil {
-    logfile.WriteString(err2.Error())
-  }
-
-  logfile.WriteString("done\n")
-
-  cmd.Wait()
+  wg.Wait()
 }
 
 func handler(conn net.Conn) error {
